@@ -1,5 +1,6 @@
 package controlador;
 
+import dao.SeriesDao;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,8 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.daniel.dao.UserDao;
-import com.daniel.model.User;
+import modelo.Series;
+
 /**
  * Adaptado de https://danielniko.wordpress.com/2012/04/17/simple-crud-using-jsp-servlet-and-mysql/
  * @author Fabian Giraldo
@@ -18,38 +19,31 @@ import com.daniel.model.User;
 public class Controlador1 extends HttpServlet
 {
     private static final long serialVersionUID = 1L;
-    private static String INSERT_OR_EDIT = "/user.jsp";
-    private static String LIST_USER = "/listUser.jsp";
-    private UserDao dao;
+    private static String INSERT_OR_EDIT = "/series.jsp";
+    private static String LIST_SERIES = "/listseries.jsp";
+    private SeriesDao dao;
 
     public Controlador1()
     {
         super();
-        dao = new UserDao();
+        dao = new SeriesDao();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         String forward = "";
         String action = request.getParameter("action");
-        if (action.equalsIgnoreCase("delete"))
-        {
-            int userId = Integer.parseInt(request.getParameter("userId"));
-            dao.deleteUser(userId);
-            forward = LIST_USER;
-            request.setAttribute("users", dao.getAllUsers());
-        }
-        else if (action.equalsIgnoreCase("edit"))
+         if (action.equalsIgnoreCase("edit"))
         {
             forward = INSERT_OR_EDIT;
-            int userId = Integer.parseInt(request.getParameter("userId"));
-            User user = dao.getUserById(userId);
-            request.setAttribute("user", user);
+            int seriesid = Integer.parseInt(request.getParameter("idseries"));
+            Series series = dao.getSerieById(seriesid);
+            request.setAttribute("idseries", series);
         }
         else if (action.equalsIgnoreCase("listUser"))
         {
-            forward = LIST_USER;
-            request.setAttribute("users", dao.getAllUsers());
+            forward = LIST_SERIES;
+            request.setAttribute("idseries", dao.getAllSeries());
         }
         else
         {
@@ -62,33 +56,19 @@ public class Controlador1 extends HttpServlet
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        User user = new User();
-        user.setFirstName(request.getParameter("firstName"));
-        user.setLastName(request.getParameter("lastName"));
-        try
+        Series series = new Series();
+        series.setNocapitulo(Integer.parseInt(request.getParameter("nocapitulo")));
+        series.setTemporadas(Integer.parseInt(request.getParameter("temporadas")));
+        
+ 
+        String idseries = request.getParameter("idseries");
+        if (idseries == null || idseries.isEmpty())
         {
-            Date dob = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dob"));
-            user.setDob(dob);
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
+            dao.addSeries(series);
         }
         
-        user.setEmail(request.getParameter("email"));
-        String userid = request.getParameter("userid");
-        if (userid == null || userid.isEmpty())
-        {
-            dao.addUser(user);
-        }
-        else
-        {
-            user.setUserid(Integer.parseInt(userid));
-            dao.updateUser(user);
-        }
-        
-        RequestDispatcher view = request.getRequestDispatcher(LIST_USER);
-        request.setAttribute("users", dao.getAllUsers());
+        RequestDispatcher view = request.getRequestDispatcher(LIST_SERIES);
+        request.setAttribute("series", dao.getAllSeries());
         view.forward(request, response);
     }
 }

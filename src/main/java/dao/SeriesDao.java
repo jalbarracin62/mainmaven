@@ -13,9 +13,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import com.daniel.model.User;
+
 import modelo.Video;
-import com.daniel.util.DbUtil;
+import Servicios.DbUtil;
 
 public class SeriesDao
 {
@@ -26,7 +26,7 @@ public class SeriesDao
         connection = DbUtil.getConnection();
     }
 
-    public void addVideo(Series series)
+    public void addSeries(Series series)
     {
         try
         {
@@ -45,53 +45,50 @@ public class SeriesDao
 
    
 
-    public List<User> getAllUsers()
+    public List<Series> getAllSeries()
     {
-        List<User> users = new ArrayList<User>();
+        List<Series> seriess = new ArrayList<Series>();
         try
         {
             System.out.println("LLegue hasta aca");
             Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("select * from users");
+            ResultSet rs = statement.executeQuery("select * from series");
             while (rs.next())
             {
-                User user = new User();
-                user.setUserid(rs.getInt("userid"));
-                user.setFirstName(rs.getString("firstname"));
-                user.setLastName(rs.getString("lastname"));
-                user.setDob(rs.getDate("dob"));
-                user.setEmail(rs.getString("email"));
-                users.add(user);
+                Series serie = new Series();
+               serie.setIdseries(rs.getInt("idseries"));
+                serie.setNocapitulo(rs.getInt("nocapitulo"));
+                   serie.setTemporadas(rs.getInt("temporadas"));
+                seriess.add(serie);
             }
         }
         catch (SQLException e)
         {
             e.printStackTrace();
         }
-        return users;
+        return seriess;
     }
 
-    public User getUserById(int userId)
+    public Series getSerieById(int serieid)
     {
-        User user = new User();
+        Series series = new Series();
         try
         {
-            PreparedStatement preparedStatement = connection.prepareStatement("select * from users where userid=?");
-            preparedStatement.setInt(1, userId);
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from series where idseries=?");
+            preparedStatement.setInt(1, serieid);
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.next())
             {
-                user.setUserid(rs.getInt("userid"));
-                user.setFirstName(rs.getString("firstname"));
-                user.setLastName(rs.getString("lastname"));
-                user.setDob(rs.getDate("dob"));
-                user.setEmail(rs.getString("email"));
+                series.setIdseries(rs.getInt("idseries"));
+                series.setNocapitulo(rs.getInt("nocapitulo"));
+                series.setTemporadas(rs.getInt("temporadas"));
+                
             }
         }
         catch (SQLException e)
         {
             e.printStackTrace();
         }
-        return user;
+        return series;
     }
 }

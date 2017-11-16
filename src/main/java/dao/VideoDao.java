@@ -12,9 +12,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import com.daniel.model.User;
+
 import modelo.Video;
-import com.daniel.util.DbUtil;
+import Servicios.DbUtil;
 
 public class VideoDao
 {
@@ -46,30 +46,33 @@ public class VideoDao
     }
 
    
-    public List<User> getAllUsers()
+    public List<Video> getAllVideos()
     {
-        List<User> users = new ArrayList<User>();
+        List<Video> videos = new ArrayList<Video>();
         try
         {
             System.out.println("LLegue hasta aca");
             Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("select * from users");
+            ResultSet rs = statement.executeQuery("select * from video order by director DESC");
             while (rs.next())
             {
-                User user = new User();
-                user.setUserid(rs.getInt("userid"));
-                user.setFirstName(rs.getString("firstname"));
-                user.setLastName(rs.getString("lastname"));
-                user.setDob(rs.getDate("dob"));
-                user.setEmail(rs.getString("email"));
-                users.add(user);
+                Video video = new Video();
+                video.setIdvideo(rs.getInt("idvideo"));
+                video.setFkseries(rs.getInt("fkseries"));
+
+                video.setTitulo(rs.getString("titulo"));
+                video.setDirector(rs.getString("director"));
+                video.setCreacion(rs.getDate("dob"));
+                video.setGenero(rs.getString("genero"));
+               
+                videos.add(video);
             }
         }
         catch (SQLException e)
         {
             e.printStackTrace();
         }
-        return users;
+        return videos;
     }
 
     public Video getvideoById(int videoId)
